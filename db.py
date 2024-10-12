@@ -35,6 +35,7 @@ async def upload_order(food_dict: dict):
     query = 'INSERT INTO order_details VALUES (%s, %s, %s, %s)'
 
     values = []
+    total_amount_each_item = []
     
     for key,value in food_dict.items():
         query_for_index = ('SELECT id FROM food_items where item = %s')
@@ -49,6 +50,7 @@ async def upload_order(food_dict: dict):
         price = cursor.fetchone()[0]
         print(f'Price = {price}')
         amount = price * quantity
+        total_amount_each_item.append(amount)
 
         values.append((next_order_id, index, quantity, amount))
     
@@ -69,7 +71,11 @@ async def upload_order(food_dict: dict):
 
     insert_order_tracking(next_order_id)
 
-    return {'order_id': next_order_id, 'total_amount': total_amount}
+    return {
+        'order_id': next_order_id, 
+        'total_amount': total_amount, 
+        'total_amount_each_item': total_amount_each_item
+    }
 
 def get_next_order_id():
     cursor = cnx.cursor()

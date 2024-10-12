@@ -8,7 +8,7 @@ def extract_session_id(session_string:str):
 
 def get_order_list(food_dict:dict):
     format = [f'{int(value)} {key}' for key, value in food_dict.items()]
-    return ', '.join(format)
+    return '\n'.join(format)
 
 # if __name__ == "__main__":
 #     r = {'Cheeseburger': 5.0, 'Pepperoni pizza': 2.0, 'Mozzarella sticks': 5.0}

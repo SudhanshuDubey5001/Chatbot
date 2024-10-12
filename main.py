@@ -11,7 +11,10 @@ inProgress_orders = {}
 @app.get("/")
 async def handleRequest():
     return JSONResponse(
-        content = {'message': 'Backend is running!!'}
+        content = {
+            'fulfillmentText': f"""
+                Backend is running
+            """}
     )
 
 @app.post("/")
@@ -36,6 +39,7 @@ async def handleRequest(request: Request):
     #     return await track_order(parameters)
 
     intent_handler_dict = {
+        'Default Welcome Intent': welcome,
         'order.track-context:ongoing-tracking': track_order,
         'order.add - context: ongoing-order': add_to_order,
         'order.remove - context: ongoing-order': remove_order,
@@ -43,14 +47,37 @@ async def handleRequest(request: Request):
     }
 
     return await intent_handler_dict[intent_name](parameters,session_id)
-        
+
+async def welcome(parameters: dict, session_id:str):
+    menu = f"""
+1. Cheeseburger: ₹80
+2. French fries: ₹50
+3. Chicken nuggets: ₹90
+4. Pepperoni pizza: ₹120
+5. Hot dog: ₹70
+6. Fried chicken sandwich: ₹100
+7. Taco: ₹60
+8. Mozzarella sticks: ₹80
+9. Onion rings: ₹40
+10. Milkshake: ₹75
+"""
+
+    return JSONResponse(
+        content = {
+            'fulfillmentText': f"""
+Welcome to the establishment. Here is the menu            
+{menu}
+Say "new order" to start ordering!
+"""}
+    )
+
 async def add_to_order(parameters: dict, session_id:str):
     food_items = parameters['food-items']
     quantity = parameters['number']
 
     if len(food_items)!=len(quantity):
         return JSONResponse(
-            content = {'fulfillmentText': 'Sorry, I did not understand. Please clearly specify the food items and quantity'}
+            content = {'fulfillmentText': f'Sorry, I did not understand. Please clearly specify the food items and quantity'}
         )
     else:
         food_dict = dict(zip(food_items,quantity))
@@ -63,7 +90,11 @@ async def add_to_order(parameters: dict, session_id:str):
 
         return JSONResponse(
             content = {
-                'fulfillmentText': f'Amazing! Added to the order. So far you have {order_str}. Do you need anything else?'
+                'fulfillmentText': f"""
+                    Amazing! Added to the order. So far you have - 
+{order_str}
+Do you need anything else?
+                    """
                 }
         )
     
@@ -94,6 +125,12 @@ async def complete_order(parameters: dict, session_id:str):
     print(f'Food dict = {inProgress_orders[session_id]}')
     result = await db.upload_order(inProgress_orders[session_id])
 
+    order_item_str = ''
+    i=0
+    for key,value in inProgress_orders[session_id].items():
+        order_item_str+=f'{int(value)} {key} ₹{result['total_amount_each_item'][i]}\n'
+        i+=1
+
     #remove the session ID bcz order is complete
     del inProgress_orders[session_id]
 
@@ -106,7 +143,15 @@ async def complete_order(parameters: dict, session_id:str):
     else:
         return JSONResponse(
             content = {
-                'fulfillmentText': f'Whoohoo!! Order placed successfully! Here are the details - Order ID: #{result['order_id']} and your total amount: ₹{result['total_amount']}'
+                'fulfillmentText': f"""
+Whoohoo!! Order placed successfully! Here are the details -
+
+Order ID: #{result['order_id']}
+
+{order_item_str} 
+Total amount: ₹{result['total_amount']}
+Track your order by saying "track order"
+"""
             }
         )
 
