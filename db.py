@@ -37,7 +37,7 @@ async def upload_order(food_dict: dict):
 
     next_order_id = get_next_order_id()
 
-    query = 'INSERT INTO order_details VALUES (%s, %s, %s, %s)'
+    query = 'INSERT INTO order_details (order_id, item_id, quantity, amount) VALUES (%s, %s, %s, %s)'
 
     values = []
     total_amount_each_item = []
