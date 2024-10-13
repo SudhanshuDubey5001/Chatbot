@@ -1,12 +1,16 @@
 import mysql.connector
+import os
+from dotenv import load_dotenv
 
 global cnx
+
+load_dotenv()
 
 cnx = mysql.connector.connect(
     host = 'chatbot-order-food-mysqldb-chatbot-food-order-db.l.aivencloud.com',
     user = 'avnadmin',
     port = '26271',    
-    password = 'AVNS_2gglVMUeF4s7RtJnAqu',
+    password = os.getenv('AIVEN_DB_KEY'),
     database = 'defaultdb'
 )
 
