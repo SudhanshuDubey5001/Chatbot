@@ -3,10 +3,11 @@ import mysql.connector
 global cnx
 
 cnx = mysql.connector.connect(
-    host = 'localhost',
-    user = 'root',
-    password = 'anotherme',
-    database = 'Chatbot'
+    host = 'chatbot-order-food-mysqldb-chatbot-food-order-db.l.aivencloud.com',
+    user = 'avnadmin',
+    port = '26271',    
+    password = 'AVNS_2gglVMUeF4s7RtJnAqu',
+    database = 'defaultdb'
 )
 
 print('Database Connected!!')

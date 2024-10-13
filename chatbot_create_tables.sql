@@ -1,4 +1,4 @@
-use Chatbot;
+use defaultdb;
 
 create table food_items(
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,6 +22,7 @@ values
 select * from food_items;
 
 create table order_details(
+	order_index int auto_increment primary key not null,
 	order_id int not null,
     item_id int not null,
     quantity int not null,
