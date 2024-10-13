@@ -40,6 +40,7 @@ async def handleRequest(request: Request):
 
     intent_handler_dict = {
         'Default Welcome Intent': welcome,
+        'new.order - context: ongoing-order': new_order,
         'order.track-context:ongoing-tracking': track_order,
         'order.add - context: ongoing-order': add_to_order,
         'order.remove - context: ongoing-order': remove_order,
@@ -48,8 +49,8 @@ async def handleRequest(request: Request):
 
     return await intent_handler_dict[intent_name](parameters,session_id)
 
-async def welcome(parameters: dict, session_id:str):
-    menu = f"""
+async def new_order(parameters: dict, session_id:str):
+        menu = f"""
 1. Cheeseburger: ₹80
 2. French fries: ₹50
 3. Chicken nuggets: ₹90
@@ -61,13 +62,21 @@ async def welcome(parameters: dict, session_id:str):
 9. Onion rings: ₹40
 10. Milkshake: ₹75
 """
+        return JSONResponse(
+        content = {
+            'fulfillmentText': f"""
+Here is the menu: 
+{menu}
+Start ordering by saying like "I want 2 burger and three tacos". Your turn..
+"""}
+    )
 
+async def welcome(parameters: dict, session_id:str):
     return JSONResponse(
         content = {
             'fulfillmentText': f"""
-Welcome to the establishment. Here is the menu            
-{menu}
-Say "new order" to start ordering!
+Heyo! Welcome to the establishment. Let's get you some nice and hot food.            
+Say "new order" to see the menu and start ordering!
 """}
     )
 
